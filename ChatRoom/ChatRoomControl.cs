@@ -8,7 +8,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ChatRoomControlV2 : RoomTemplate {
+public class ChatRoomControl : RoomTemplate
+{
 
     public InputField inputField;
     public Transform contentParent;

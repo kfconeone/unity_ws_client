@@ -48,11 +48,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1992333416463108}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4374730a602d8e446a40f26b2af06791, type: 3}
+  m_Script: {fileID: 11500000, guid: 05edd8c9b72bca645a6457787cb4fda2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  webSocketController: {fileID: 0}
+  roomName: LobbyChatRoom
   inputField: {fileID: 0}
   contentParent: {fileID: 0}
   textPrefab: {fileID: 0}
   sendMessageButton: {fileID: 0}
-  webSocketController: {fileID: 0}
+  nickName: John
