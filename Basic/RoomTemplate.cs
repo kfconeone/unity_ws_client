@@ -17,6 +17,8 @@ public abstract class RoomTemplate : MonoBehaviour {
     WebSocket webSocket;
     string sessionId;
 
+    public event Action errorEvent;
+
     public abstract void OnMessage(string _message);
     public abstract void OnError(string _message);
     public abstract void OnSubscribeFinished(string _message);
@@ -28,6 +30,8 @@ public abstract class RoomTemplate : MonoBehaviour {
     {
         Debug.Log("OnOpen");
     }
+
+
 
     void OnMessageEvent(string _message)
     {
@@ -77,18 +81,12 @@ public abstract class RoomTemplate : MonoBehaviour {
 
     void OnErrorEvent(string _errorMessage)
     {
-        Debug.LogError("這裡是連接錯誤事件，等待五秒後重連");
         Debug.LogError("Error Message : " + _errorMessage);
         OnError(_errorMessage);
-        StartCoroutine(Reconnect());
+        if (errorEvent != null) errorEvent();
     }
 
-    IEnumerator Reconnect()
-    {
-        CloseConnection();
-        yield return new WaitForSeconds(5);
-        OpenConnection();
-    }
+    
 
     public virtual void Push(string _url,object _pushObject,Action<string> _callback)
     {
@@ -105,7 +103,7 @@ public abstract class RoomTemplate : MonoBehaviour {
         request.Send();
     }
 
-    protected WebSocket OpenConnection()
+    public WebSocket OpenConnection()
     {
         if (string.IsNullOrEmpty(roomName))
         {
@@ -128,7 +126,7 @@ public abstract class RoomTemplate : MonoBehaviour {
         return webSocket;
     }
 
-    protected void CloseConnection()
+    public void CloseConnection()
     {
         if (webSocket != null)
         {
@@ -146,6 +144,7 @@ public abstract class RoomTemplate : MonoBehaviour {
         webSocketController.messageReceivedEvent -= OnMessageEvent;
         webSocketController.closeEvent -= OnClose;
         webSocketController.errorEvent -= OnErrorEvent;
+        
     }
 
 }

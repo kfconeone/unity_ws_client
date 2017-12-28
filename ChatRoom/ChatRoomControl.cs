@@ -20,18 +20,6 @@ public class ChatRoomControl : RoomTemplate
     double lastUpdateTime;
     List<JObject> currentTable;
 
-    private void OnGUI()
-    {
-        if (GUILayout.Button("111111111"))
-        {
-            OpenConnection();
-        }
-
-        if (GUILayout.Button("222222222"))
-        {
-            CloseConnection();
-        }
-    }
     public override void OnSubscribeFinished(string _json)
     {
         JObject res = JsonConvert.DeserializeObject<JObject>(_json);
