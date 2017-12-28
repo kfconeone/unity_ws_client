@@ -5,6 +5,8 @@ using BestHTTP.WebSocket;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 public class WebSocketController : MonoBehaviour {
 
@@ -14,10 +16,11 @@ public class WebSocketController : MonoBehaviour {
     WebSocket webSocket;
 
     public event Action openEvent;
-    public event Action<string> messageReceivedEvent;
+    public event Action<string,bool> messageReceivedEvent;
     public event Action<int,string> closeEvent;
     public event Action<string> errorEvent;
 
+    public string sessionId;
 
     //public const string HOST = "35.194.157.51:8081";
     public const string HOST = "localhost:8081";
@@ -86,7 +89,14 @@ public class WebSocketController : MonoBehaviour {
     /// </summary>
     void OnMessageReceived(WebSocket ws, string message)
     {
-        if (messageReceivedEvent != null) messageReceivedEvent.Invoke(message);
+        JObject res = JsonConvert.DeserializeObject<JObject>(message);
+        string tableId = res.GetValue("tableId").ToString();
+        if (tableId == "CONNECT")
+        {
+            sessionId = res.GetValue("sessionId").ToString();
+
+        }
+        if (messageReceivedEvent != null) messageReceivedEvent.Invoke(message, (tableId == "CONNECT"));
     }
 
     /// <summary>

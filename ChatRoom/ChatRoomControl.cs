@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class ChatRoomControl : RoomTemplate
 {
 
+    public GameObject chatroom;
     public InputField inputField;
     public Transform contentParent;
     public Text textPrefab;
@@ -106,4 +107,8 @@ public class ChatRoomControl : RoomTemplate
         txt.enabled = true;
     }
 
+    public void FlipChatroom()
+    {
+        chatroom.SetActive(!chatroom.activeSelf);
+    }
 }

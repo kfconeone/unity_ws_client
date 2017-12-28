@@ -15,7 +15,6 @@ public abstract class RoomTemplate : MonoBehaviour {
     public string roomName;
 
     WebSocket webSocket;
-    string sessionId;
 
     public event Action errorEvent;
 
@@ -33,13 +32,10 @@ public abstract class RoomTemplate : MonoBehaviour {
 
 
 
-    void OnMessageEvent(string _message)
+    void OnMessageEvent(string _message,bool _isConnect)
     {
-        JObject res = JsonConvert.DeserializeObject<JObject>(_message);
-        string tableId = res.GetValue("tableId").ToString();
-        if (tableId == "CONNECT")
+        if (_isConnect)
         {
-            sessionId = res.GetValue("sessionId").ToString();
             SubscribeTable(true);
         }
         else
@@ -73,7 +69,7 @@ public abstract class RoomTemplate : MonoBehaviour {
 
         Dictionary<string, object> req = new Dictionary<string, object>();
         req.Add("tableId", roomName);
-        req.Add("sessionId", sessionId);
+        req.Add("sessionId", webSocketController.sessionId);
 
         request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
         request.Send();
@@ -97,7 +93,7 @@ public abstract class RoomTemplate : MonoBehaviour {
         });
         Dictionary<string, object> req = new Dictionary<string, object>();
         req.Add("tableId", roomName);
-        req.Add("pushObject", sessionId);
+        req.Add("pushObject", webSocketController.sessionId);
 
         request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
         request.Send();
@@ -123,6 +119,8 @@ public abstract class RoomTemplate : MonoBehaviour {
         webSocketController.errorEvent += OnErrorEvent;
 
         webSocket = webSocketController.OpenWebSocket();
+        //如果已經連結了一個以上的房間，則需要再次註冊
+        if (webSocket.IsOpen) SubscribeTable(true);
         return webSocket;
     }
 
