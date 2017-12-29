@@ -10,30 +10,29 @@ using Newtonsoft.Json;
 
 public class WebSocketController : MonoBehaviour {
 
+
+
     /// <summary>
     /// Saved WebSocket instance
     /// </summary>
-    WebSocket webSocket;
+    [HideInInspector]
+    public WebSocket webSocket;
 
     public event Action openEvent;
     public event Action<string,bool> messageReceivedEvent;
     public event Action<int,string> closeEvent;
     public event Action<string> errorEvent;
 
+    [HideInInspector]
     public string sessionId;
-
     //public const string HOST = "35.194.157.51:8081";
     public const string HOST = "localhost:8081";
     //ws://localhost:8081/interactive
     // Use this for initialization
     public WebSocket OpenWebSocket() {
         // Create the WebSocket instance
-        if (webSocket != null)
-        {
-            if (webSocket.IsOpen) return webSocket;
-            else webSocket = null;
+        if (webSocket != null) return webSocket;
 
-        }
         webSocket = new WebSocket(new Uri("ws://" + HOST + "/interactive"));
         webSocket.StartPingThread = true;
 
@@ -49,8 +48,10 @@ public class WebSocketController : MonoBehaviour {
         webSocket.OnClosed += OnClosed;
         webSocket.OnError += OnError;
 
+        Debug.Log("開始連接伺服器：" + "ws://" + HOST + "/interactive");
         // Start connecting to the server
         webSocket.Open();
+
         return webSocket;
     }
 
@@ -81,7 +82,7 @@ public class WebSocketController : MonoBehaviour {
     void OnOpen(WebSocket ws)
     {
         Debug.Log(string.Format("連接成功\n"));
-        if(openEvent != null)   openEvent.Invoke();
+        //if(openEvent != null)   openEvent.Invoke();
     }
 
     /// <summary>
@@ -94,7 +95,9 @@ public class WebSocketController : MonoBehaviour {
         if (tableId == "CONNECT")
         {
             sessionId = res.GetValue("sessionId").ToString();
-
+            Debug.Log("當前連線的sessionId : " + sessionId);
+            if (openEvent != null) openEvent.Invoke();
+            return;
         }
         if (messageReceivedEvent != null) messageReceivedEvent.Invoke(message, (tableId == "CONNECT"));
     }

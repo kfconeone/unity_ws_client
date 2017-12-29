@@ -14,8 +14,6 @@ public abstract class RoomTemplate : MonoBehaviour {
     public WebSocketController webSocketController;
     public string roomName;
 
-    WebSocket webSocket;
-
     public event Action errorEvent;
 
     public abstract void OnMessage(string _message);
@@ -34,18 +32,12 @@ public abstract class RoomTemplate : MonoBehaviour {
 
     void OnMessageEvent(string _message,bool _isConnect)
     {
-        if (_isConnect)
-        {
-            SubscribeTable(true);
-        }
-        else
-        {
-            OnMessage(_message);
-        }
+        OnMessage(_message);
     }
 
-    void SubscribeTable(bool _isSubscribe)
+    void Subscribing(bool _isSubscribe)
     {
+
         string path;
         if (_isSubscribe)
             path = "/Subscribe";
@@ -84,7 +76,7 @@ public abstract class RoomTemplate : MonoBehaviour {
 
     
 
-    public virtual void Push(string _url,object _pushObject,Action<string> _callback)
+    public void Push(string _url,object _pushObject,Action<string> _callback)
     {
         Uri uri = new Uri(_url);
         HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
@@ -99,50 +91,39 @@ public abstract class RoomTemplate : MonoBehaviour {
         request.Send();
     }
 
-    public WebSocket OpenConnection()
+
+
+    public bool SubscribeTable()
     {
         if (string.IsNullOrEmpty(roomName))
         {
-            Debug.LogError("房名不得為空，連接失敗");
-            return null;
+            Debug.LogError("房名不得為空，註冊失敗");
+            return false;
         }
 
-        if (webSocketController == null)
+        if (!webSocketController.webSocket.IsOpen)
         {
-            Debug.LogError("Controller沒有指定，連接失敗");
-            return null;
+            Debug.LogError("與Server端無連接，註冊失敗");
+            return false;
         }
+
 
         webSocketController.openEvent += OnOpen;
         webSocketController.messageReceivedEvent += OnMessageEvent;
         webSocketController.closeEvent += OnClose;
         webSocketController.errorEvent += OnErrorEvent;
 
-        webSocket = webSocketController.OpenWebSocket();
-        //如果已經連結了一個以上的房間，則需要再次註冊
-        if (webSocket.IsOpen) SubscribeTable(true);
-        return webSocket;
+        Subscribing(true);
+        return true;
     }
 
-    public void CloseConnection()
+    public void UnsubscribeTable()
     {
-        if (webSocket != null)
-        {
-            if (webSocket.IsOpen)
-            {
-                SubscribeTable(false);
-            }
-            else
-            {
-                webSocket = null;
-            }
-        }
-
+        Subscribing(false);
         webSocketController.openEvent -= OnOpen;
         webSocketController.messageReceivedEvent -= OnMessageEvent;
         webSocketController.closeEvent -= OnClose;
-        webSocketController.errorEvent -= OnErrorEvent;
-        
+        webSocketController.errorEvent -= OnErrorEvent;     
     }
 
 }
