@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4565285713737920}
   - component: {fileID: 114796091555198906}
+  - component: {fileID: 114040834143860098}
   m_Layer: 0
   m_Name: Connector
   m_TagString: Untagged
@@ -40,6 +41,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114040834143860098
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1740366558692908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8f4d5743af3e794da7fc061be09335c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConnectInterval: 5
 --- !u!114 &114796091555198906
 MonoBehaviour:
   m_ObjectHideFlags: 1

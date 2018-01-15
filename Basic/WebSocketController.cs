@@ -25,7 +25,7 @@ public class WebSocketController : MonoBehaviour {
 
     [HideInInspector]
     public string sessionId;
-    //public const string HOST = "35.194.157.51:8081";
+    //public const string HOST = "35.189.187.45:8081";
     public const string HOST = "localhost:8081";
     //ws://localhost:8081/interactive
     // Use this for initialization
@@ -34,9 +34,8 @@ public class WebSocketController : MonoBehaviour {
         if (webSocket != null) return webSocket;
 
         webSocket = new WebSocket(new Uri("ws://" + HOST + "/interactive"));
+
         webSocket.StartPingThread = true;
-
-
 #if !BESTHTTP_DISABLE_PROXY && !UNITY_WEBGL
         if (HTTPManager.Proxy != null)
             webSocket.InternalRequest.Proxy = new HTTPProxy(HTTPManager.Proxy.Address, HTTPManager.Proxy.Credentials, false);

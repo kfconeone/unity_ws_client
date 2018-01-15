@@ -47,6 +47,11 @@ public abstract class RoomTemplate : MonoBehaviour {
         Uri uri = new Uri("http://" + WebSocketController.HOST + path);
         HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
         {
+            if (response == null || response.StatusCode != 200)
+            {
+                Debug.LogError("與伺服器端連接失敗");
+                return;
+            }
 
             if (_isSubscribe)
             {
@@ -81,6 +86,12 @@ public abstract class RoomTemplate : MonoBehaviour {
         Uri uri = new Uri(_url);
         HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
         {
+            if (response == null || response.StatusCode != 200)
+            {
+                Debug.LogError("與伺服器端連接失敗");
+                return;
+            }
+
             _callback(response.DataAsText);
         });
         Dictionary<string, object> req = new Dictionary<string, object>();

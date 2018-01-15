@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,8 @@ public class ChatRoomControl : RoomTemplate
     public Transform contentParent;
     public Text textPrefab;
     public Button sendMessageButton;
+    public RawImage connectingPic;
+
 
     public string nickName;
     double lastUpdateTime;
@@ -30,7 +33,9 @@ public class ChatRoomControl : RoomTemplate
             return;
         }
 
-        GenerateText("系統訊息", "連接聊天室成功", "ffff00ff");
+        //GenerateText("系統訊息", "連接聊天室成功", "ffff00ff");
+        connectingPic.gameObject.SetActive(false);
+
         if (res.GetValue("detail").HasValues)
         {
             currentTable = JsonConvert.DeserializeObject<List<JObject>>(res.GetValue("detail").ToString());
@@ -50,6 +55,8 @@ public class ChatRoomControl : RoomTemplate
                 lastUpdateTime = tempDate;
             }
         }
+
+        
     }
 
     public override void OnMessage(string _message)
@@ -71,7 +78,8 @@ public class ChatRoomControl : RoomTemplate
     {
         Debug.Log("這裡是聊天室連接錯誤事件");
         Debug.Log("Error Message : " + _errorMessage);
-        GenerateText("系統提醒", "網路不穩，正在重新連接聊天室...", "ffff00ff");
+        connectingPic.gameObject.SetActive(true);
+        //GenerateText("系統提醒", "網路不穩，正在重新連接聊天室...", "ffff00ff");
     }
 
     public void SendMsg()
@@ -83,7 +91,7 @@ public class ChatRoomControl : RoomTemplate
         tempChat.Add("name", nickName);
         tempChat.Add("content", inputField.text);
         tempChat.Add("date", lastUpdateTime);
-
+        
         Dictionary<string, object> req = new Dictionary<string, object>();
         req.Add("tableId", roomName);
         req.Add("pushObject", tempChat);
@@ -94,7 +102,20 @@ public class ChatRoomControl : RoomTemplate
 
     private void OnSendMsgFinish(HTTPRequest originalRequest, HTTPResponse response)
     {
+        if (response == null || response.StatusCode != 200)
+        {
+            Debug.LogError("與伺服器端連接失敗");
+            return;
+        }
+
+
         Debug.Log("聊天室傳送結束訊息：" + response.DataAsText);
+        JObject res = JsonConvert.DeserializeObject<JObject>(response.DataAsText);
+        string result = res.GetValue("result").ToString();
+        if (!result.Contains("000"))
+        {
+            GenerateText("系統提醒", "網路不穩，正在重新連接聊天室...", "ffff00ff");
+        }
     }
 
 
