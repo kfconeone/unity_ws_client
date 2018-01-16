@@ -81,26 +81,26 @@ public abstract class RoomTemplate : MonoBehaviour {
 
     
 
-    public void Push(string _url,object _pushObject,Action<string> _callback)
-    {
-        Uri uri = new Uri(_url);
-        HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
-        {
-            if (response == null || response.StatusCode != 200)
-            {
-                Debug.LogError("與伺服器端連接失敗");
-                return;
-            }
+    //public void Push(string _url,object _pushObject,Action<string> _callback)
+    //{
+    //    Uri uri = new Uri(_url);
+    //    HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
+    //    {
+    //        if (response == null || response.StatusCode != 200)
+    //        {
+    //            Debug.LogError("與伺服器端連接失敗");
+    //            return;
+    //        }
 
-            _callback(response.DataAsText);
-        });
-        Dictionary<string, object> req = new Dictionary<string, object>();
-        req.Add("tableId", roomName);
-        req.Add("pushObject", webSocketController.sessionId);
+    //        _callback(response.DataAsText);
+    //    });
+    //    Dictionary<string, object> req = new Dictionary<string, object>();
+    //    req.Add("tableId", roomName);
+    //    req.Add("pushObject", webSocketController.sessionId);
 
-        request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
-        request.Send();
-    }
+    //    request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
+    //    request.Send();
+    //}
 
 
 
