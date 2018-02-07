@@ -25,8 +25,8 @@ public class WebSocketController : MonoBehaviour {
 
     [HideInInspector]
     public string sessionId;
-    //public const string HOST = "35.189.187.45:8081";
-    public const string HOST = "localhost:8081";
+    public const string HOST = "35.189.187.45:8081";
+    //public const string HOST = "localhost:8081";
     //ws://localhost:8081/interactive
     // Use this for initialization
     public WebSocket OpenWebSocket() {

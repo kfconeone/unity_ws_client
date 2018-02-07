@@ -17,7 +17,7 @@ public class ChatRoomControl : RoomTemplate
     public Transform contentParent;
     public Text textPrefab;
     public Button sendMessageButton;
-    public RawImage connectingPic;
+    //public RawImage connectingPic;
 
 
     public string nickName;
@@ -34,7 +34,7 @@ public class ChatRoomControl : RoomTemplate
         }
 
         //GenerateText("系統訊息", "連接聊天室成功", "ffff00ff");
-        connectingPic.gameObject.SetActive(false);
+        //connectingPic.gameObject.SetActive(false);
 
         if (res.GetValue("detail").HasValues)
         {
@@ -78,7 +78,7 @@ public class ChatRoomControl : RoomTemplate
     {
         Debug.Log("這裡是聊天室連接錯誤事件");
         Debug.Log("Error Message : " + _errorMessage);
-        connectingPic.gameObject.SetActive(true);
+        //connectingPic.gameObject.SetActive(true);
         //GenerateText("系統提醒", "網路不穩，正在重新連接聊天室...", "ffff00ff");
     }
 
@@ -110,6 +110,7 @@ public class ChatRoomControl : RoomTemplate
 
 
         Debug.Log("聊天室傳送結束訊息：" + response.DataAsText);
+        inputField.text = string.Empty;
         JObject res = JsonConvert.DeserializeObject<JObject>(response.DataAsText);
         string result = res.GetValue("result").ToString();
         if (!result.Contains("000"))

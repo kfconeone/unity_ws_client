@@ -22,7 +22,7 @@ public class WebSocketMonitor : MonoBehaviour {
     void HandleReconnectClose(int _code, string _message)
     {
         Debug.LogError("這裡是關閉重連事件，等待" + ConnectInterval + "秒後重連");
-        StartCoroutine(Reconnecting());
+        //StartCoroutine(Reconnecting());
     }
 
     IEnumerator Reconnecting()

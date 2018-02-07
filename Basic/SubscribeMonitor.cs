@@ -10,7 +10,13 @@ public class SubscribeMonitor : MonoBehaviour
     void OnEnable()
     {
         Debug.Log("開啟自動訂閱桌子 : " + GetComponent<RoomTemplate>().roomName);
-        GetComponent<RoomTemplate>().webSocketController.openEvent += HandleResubscribe;
+        WebSocketController mController = GetComponent<RoomTemplate>().webSocketController;
+
+        mController.openEvent += HandleResubscribe;
+        if (mController.webSocket != null && mController.webSocket.IsOpen)
+        {
+            GetComponent<RoomTemplate>().SubscribeTable();
+        }
     }
 
     void HandleResubscribe()
