@@ -14,6 +14,7 @@ public abstract class RoomTemplate : MonoBehaviour {
     public WebSocketController webSocketController;
     public string groupId;
     public string roomName;
+    public bool isQueueTable;
 
     public event Action errorEvent;
 
@@ -68,6 +69,7 @@ public abstract class RoomTemplate : MonoBehaviour {
         Dictionary<string, object> req = new Dictionary<string, object>();
         req.Add("groupId", groupId);
         req.Add("tableId", roomName);
+        req.Add("isQueueTable", isQueueTable);
         req.Add("sessionId", webSocketController.sessionId);
 
         request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));

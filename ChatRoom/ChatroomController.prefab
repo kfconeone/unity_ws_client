@@ -66,6 +66,7 @@ MonoBehaviour:
   webSocketController: {fileID: 0}
   groupId: ChatRoom
   roomName: LobbyChatRoom
+  isQueueTable: 1
   chatroom: {fileID: 0}
   inputField: {fileID: 0}
   contentParent: {fileID: 0}
