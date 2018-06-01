@@ -93,6 +93,7 @@ public class ChatRoomControl : RoomTemplate
         tempChat.Add("date", lastUpdateTime);
         
         Dictionary<string, object> req = new Dictionary<string, object>();
+        req.Add("groupId", groupId);
         req.Add("tableId", roomName);
         req.Add("pushObject", tempChat);
 

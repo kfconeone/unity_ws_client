@@ -25,8 +25,8 @@ public class WebSocketController : MonoBehaviour {
 
     [HideInInspector]
     public string sessionId;
-    public const string HOST = "entrance10.mobiusdice.com.tw:700";
-    //public const string HOST = "localhost:8081";
+    //public const string HOST = "entrance10.mobiusdice.com.tw:700";
+    public const string HOST = "localhost:8081";
     //ws://localhost:8081/interactive
     // Use this for initialization
     public WebSocket OpenWebSocket() {
@@ -95,6 +95,7 @@ public class WebSocketController : MonoBehaviour {
         {
             sessionId = res.GetValue("sessionId").ToString();
             Debug.Log("當前連線的sessionId : " + sessionId);
+
             if (openEvent != null) openEvent.Invoke();
             return;
         }
@@ -127,5 +128,28 @@ public class WebSocketController : MonoBehaviour {
     }
 
     #endregion
+
+
+    void SetAccountToSessionId(string _account,string _sessionId)
+    {
+        Uri uri = new Uri("http://" + WebSocketController.HOST + "/SetAccountToSessionId");
+        HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
+        {
+            if (response == null || response.StatusCode != 200)
+            {
+                Debug.LogError("帳號與SessionId連結失敗");
+                return;
+            }
+
+            Debug.Log("帳號與SessionId連結成功");
+        });
+
+        Dictionary<string, object> req = new Dictionary<string, object>();
+        req.Add("account", "");
+        req.Add("sessionId", sessionId);
+
+        request.RawData = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
+        request.Send();
+    }
 }
 

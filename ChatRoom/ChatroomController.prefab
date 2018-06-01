@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4602993627986684}
   - component: {fileID: 114519273284886296}
+  - component: {fileID: 114003083422230756}
   m_Layer: 0
   m_Name: ChatroomController
   m_TagString: Untagged
@@ -33,13 +34,24 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1992333416463108}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.355536, y: -42.47129, z: 90}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -218.44606, y: -406.5902, z: 0}
+  m_LocalScale: {x: 9.353074, y: 9.353074, z: 9.353074}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114003083422230756
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1992333416463108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25c0c872871a51940bd91d7b2d008260, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114519273284886296
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -52,9 +64,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webSocketController: {fileID: 0}
+  groupId: ChatRoom
   roomName: LobbyChatRoom
+  chatroom: {fileID: 0}
   inputField: {fileID: 0}
   contentParent: {fileID: 0}
   textPrefab: {fileID: 0}
   sendMessageButton: {fileID: 0}
-  nickName: John
+  nickName: Anonymous
