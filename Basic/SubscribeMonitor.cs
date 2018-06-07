@@ -9,6 +9,15 @@ public class SubscribeMonitor : MonoBehaviour
 {
     void OnEnable()
     {
+        if (string.IsNullOrEmpty(GetComponent<RoomTemplate>().roomName) || string.IsNullOrEmpty(GetComponent<RoomTemplate>().groupId))
+        {
+            Debug.LogError("roomName或groupId其中一項為空");
+            Debug.LogError("roomName : " + GetComponent<RoomTemplate>().roomName);
+            Debug.LogError("groupId：" + GetComponent<RoomTemplate>().groupId);
+            gameObject.SetActive(false);
+            return;
+        }
+
         Debug.Log("開啟自動訂閱桌子 : " + GetComponent<RoomTemplate>().roomName);
         WebSocketController mController = GetComponent<RoomTemplate>().webSocketController;
 
