@@ -203,28 +203,5 @@ public class WebSocketController : MonoBehaviour {
     }
 
     #endregion
-
-
-    //void SetAccountToSessionId(string _account,string _sessionId)
-    //{
-    //    Uri uri = new Uri("http://" + WebSocketController.HOST + "/SetAccountToSessionId");
-    //    HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
-    //    {
-    //        if (response == null || response.StatusCode != 200)
-    //        {
-    //            Debug.LogError("帳號與SessionId連結失敗");
-    //            return;
-    //        }
-
-    //        Debug.Log("帳號與SessionId連結成功");
-    //    });
-
-    //    Dictionary<string, object> req = new Dictionary<string, object>();
-    //    req.Add("account", "");
-    //    req.Add("sessionId", sessionId);
-
-    //    request.RawData = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
-    //    request.Send();
-    //}
 }
 
