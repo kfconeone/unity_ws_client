@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(RoomTemplate))]
 /// <summary>
 /// 用來輔助RoomTemplate的class，可有可無
 /// </summary>

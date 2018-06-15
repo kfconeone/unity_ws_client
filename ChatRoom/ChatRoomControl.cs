@@ -64,14 +64,11 @@ public class ChatRoomControl : RoomTemplate
         Debug.Log("這裡是聊天室收到訊息事件");
         Debug.Log("Message : " + _message);
         JObject res = JsonConvert.DeserializeObject<JObject>(_message);
-        string tableId = res.GetValue("tableId").ToString();
 
-        if (tableId == roomName)
-        {
-            Debug.Log("收到聊天室訊息 : " + _message);
-            JObject pushObj = JsonConvert.DeserializeObject<JObject>(res.GetValue("pushObject").ToString());
-            GenerateText(pushObj.GetValue("name").ToString(), pushObj.GetValue("content").ToString(), "ffffffff");
-        }
+        Debug.Log("收到聊天室訊息 : " + _message);
+        JObject pushObj = JsonConvert.DeserializeObject<JObject>(res.GetValue("pushObject").ToString());
+        GenerateText(pushObj.GetValue("name").ToString(), pushObj.GetValue("content").ToString(), "ffffffff");
+        
     }
 
     public override void OnError(string _errorMessage)

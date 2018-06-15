@@ -28,5 +28,6 @@ public class SystemMessageControl : RoomTemplate
 
         JObject jsonObj = JsonConvert.DeserializeObject<JObject>(_message);
         systemMessage = jsonObj.GetValue("detail").ToObject<Dictionary<string, object>>();
+        
     }
 }

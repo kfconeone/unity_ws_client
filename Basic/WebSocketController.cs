@@ -18,10 +18,64 @@ public class WebSocketController : MonoBehaviour {
     [HideInInspector]
     public WebSocket webSocket;
 
+    //剩下這三個事件專門給斷線重連專用
     public event Action openEvent;
-    public event Action<string,bool> messageReceivedEvent;
+    //public event Action<string,string> messageReceivedEvent;
     public event Action<int,string> closeEvent;
     public event Action<string> errorEvent;
+
+    //以下是給使用者量產使用的事件，原本是用上方的事件處理，嘗試改為Dictionary的方式，key為"[groupId]_[tableId]"
+    public Dictionary<string, Action> openEvents
+    {
+        get
+        {
+            if (mOpenEvents == null)
+            {
+                mOpenEvents = new Dictionary<string, Action>();
+            }
+            return mOpenEvents;
+        }
+    }
+    public Dictionary<string, Action<string>> messageReceivedEvents
+    {
+        get
+        {
+            if (mMessageReceivedEvents == null)
+            {
+                mMessageReceivedEvents = new Dictionary<string, Action<string>>();
+            }
+            return mMessageReceivedEvents;
+        }
+    }
+    public Dictionary<string, Action<int, string>> closeEvents
+    {
+        get
+        {
+            if (mCloseEvents == null)
+            {
+                mCloseEvents = new Dictionary<string, Action<int, string>>();
+            }
+
+            return mCloseEvents;
+        }
+    }
+
+    public Dictionary<string, Action<string>> errorEvents
+    {
+        get
+        {
+            if (mErrorEvents == null)
+            {
+                mErrorEvents = new Dictionary<string, Action<string>>();
+            }
+            return mErrorEvents;
+        }
+    }
+
+    Dictionary<string, Action> mOpenEvents;
+    Dictionary<string, Action<string>> mMessageReceivedEvents;
+    Dictionary<string, Action<int, string>> mCloseEvents;
+    Dictionary<string, Action<string>> mErrorEvents;
 
     [HideInInspector]
     public string sessionId;
@@ -49,6 +103,8 @@ public class WebSocketController : MonoBehaviour {
 
         Debug.Log("開始連接伺服器：" + "ws://" + HOST + "/interactive");
         // Start connecting to the server
+
+
         webSocket.Open();
 
         return webSocket;
@@ -60,10 +116,14 @@ public class WebSocketController : MonoBehaviour {
         {
             webSocket.Close();    
         }
-        openEvent = null;
-        messageReceivedEvent = null;
-        closeEvent = null;
-        errorEvent = null;
+        //openEvent = null;
+        //messageReceivedEvent = null;
+        //closeEvent = null;
+        //errorEvent = null;
+        mOpenEvents.Clear();
+        mMessageReceivedEvents.Clear();
+        mCloseEvents.Clear();
+        mErrorEvents.Clear();
 
         webSocket = null;
     }
@@ -90,6 +150,11 @@ public class WebSocketController : MonoBehaviour {
     void OnMessageReceived(WebSocket ws, string message)
     {
         JObject res = JsonConvert.DeserializeObject<JObject>(message);
+        string groupId = string.Empty;
+        if (res.GetValue("groupId") != null)
+        {
+            groupId = res.GetValue("groupId").ToString();
+        }
         string tableId = res.GetValue("tableId").ToString();
         if (tableId == "CONNECT")
         {
@@ -99,7 +164,8 @@ public class WebSocketController : MonoBehaviour {
             if (openEvent != null) openEvent.Invoke();
             return;
         }
-        if (messageReceivedEvent != null) messageReceivedEvent.Invoke(message, (tableId == "CONNECT"));
+        string key = string.Format("{0}_{1}",groupId,tableId);
+        if (messageReceivedEvents.ContainsKey(key)) messageReceivedEvents[key](message);
     }
 
     /// <summary>
@@ -107,7 +173,11 @@ public class WebSocketController : MonoBehaviour {
     /// </summary>
     void OnClosed(WebSocket ws, UInt16 code, string message)
     {
-        if (closeEvent != null) closeEvent.Invoke(code, message);
+        foreach (Action<int, string> closeEvent in closeEvents.Values)
+        {
+            if (closeEvent != null) closeEvent.Invoke(code, message);
+        }
+
         webSocket = null;
     }
 
@@ -123,33 +193,38 @@ public class WebSocketController : MonoBehaviour {
 #endif
 
         Debug.Log(string.Format("連線發生錯誤: {0}\n", (ex != null ? ex.Message : "Unknown Error " + errorMsg)));
-        if (errorEvent != null) errorEvent.Invoke(ex.Message);
+        foreach (Action<string> errorEvent in errorEvents.Values)
+        {
+            if (errorEvent != null) errorEvent.Invoke(ex.Message);
+        }
+
+        
         webSocket = null;
     }
 
     #endregion
 
 
-    void SetAccountToSessionId(string _account,string _sessionId)
-    {
-        Uri uri = new Uri("http://" + WebSocketController.HOST + "/SetAccountToSessionId");
-        HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
-        {
-            if (response == null || response.StatusCode != 200)
-            {
-                Debug.LogError("帳號與SessionId連結失敗");
-                return;
-            }
+    //void SetAccountToSessionId(string _account,string _sessionId)
+    //{
+    //    Uri uri = new Uri("http://" + WebSocketController.HOST + "/SetAccountToSessionId");
+    //    HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
+    //    {
+    //        if (response == null || response.StatusCode != 200)
+    //        {
+    //            Debug.LogError("帳號與SessionId連結失敗");
+    //            return;
+    //        }
 
-            Debug.Log("帳號與SessionId連結成功");
-        });
+    //        Debug.Log("帳號與SessionId連結成功");
+    //    });
 
-        Dictionary<string, object> req = new Dictionary<string, object>();
-        req.Add("account", "");
-        req.Add("sessionId", sessionId);
+    //    Dictionary<string, object> req = new Dictionary<string, object>();
+    //    req.Add("account", "");
+    //    req.Add("sessionId", sessionId);
 
-        request.RawData = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
-        request.Send();
-    }
+    //    request.RawData = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
+    //    request.Send();
+    //}
 }
 

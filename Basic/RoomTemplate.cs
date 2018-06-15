@@ -16,8 +16,6 @@ public abstract class RoomTemplate : MonoBehaviour {
     public string roomName;
     public bool isQueueTable;
 
-    public event Action errorEvent;
-
     public abstract void OnMessage(string _message);
     public abstract void OnError(string _message);
     public abstract void OnSubscribeFinished(string _message);
@@ -32,9 +30,9 @@ public abstract class RoomTemplate : MonoBehaviour {
 
 
 
-    void OnMessageEvent(string _message,bool _isConnect)
-    {
-        OnMessage(_message);
+    void OnMessageEvent(string _message)
+    {    
+        OnMessage(_message);      
     }
 
     void Subscribing(bool _isSubscribe)
@@ -80,32 +78,7 @@ public abstract class RoomTemplate : MonoBehaviour {
     {
         Debug.LogError("Error Message : " + _errorMessage);
         OnError(_errorMessage);
-        if (errorEvent != null) errorEvent();
     }
-
-    
-
-    //public void Push(string _url,object _pushObject,Action<string> _callback)
-    //{
-    //    Uri uri = new Uri(_url);
-    //    HTTPRequest request = new HTTPRequest(uri, HTTPMethods.Post, (HTTPRequest originalRequest, HTTPResponse response) =>
-    //    {
-    //        if (response == null || response.StatusCode != 200)
-    //        {
-    //            Debug.LogError("與伺服器端連接失敗");
-    //            return;
-    //        }
-
-    //        _callback(response.DataAsText);
-    //    });
-    //    Dictionary<string, object> req = new Dictionary<string, object>();
-    //    req.Add("tableId", roomName);
-    //    req.Add("pushObject", webSocketController.sessionId);
-
-    //    request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
-    //    request.Send();
-    //}
-
 
 
     public bool SubscribeTable()
@@ -122,11 +95,11 @@ public abstract class RoomTemplate : MonoBehaviour {
             return false;
         }
 
-
-        webSocketController.openEvent += OnOpen;
-        webSocketController.messageReceivedEvent += OnMessageEvent;
-        webSocketController.closeEvent += OnClose;
-        webSocketController.errorEvent += OnErrorEvent;
+        string key = string.Format("{0}_{1}", groupId, roomName);
+        webSocketController.openEvents.Add(key, OnOpen);
+        webSocketController.messageReceivedEvents.Add(key, OnMessageEvent);
+        webSocketController.closeEvents.Add(key, OnClose);
+        webSocketController.errorEvents.Add(key, OnErrorEvent);
 
         Subscribing(true);
         return true;
@@ -135,10 +108,11 @@ public abstract class RoomTemplate : MonoBehaviour {
     public void UnsubscribeTable()
     {
         Subscribing(false);
-        webSocketController.openEvent -= OnOpen;
-        webSocketController.messageReceivedEvent -= OnMessageEvent;
-        webSocketController.closeEvent -= OnClose;
-        webSocketController.errorEvent -= OnErrorEvent;     
+        string key = string.Format("{0}_{1}", groupId, roomName);
+        webSocketController.openEvents.Remove(key);
+        webSocketController.messageReceivedEvents.Remove(key);
+        webSocketController.closeEvents.Remove(key);
+        webSocketController.errorEvents.Remove(key);
     }
 
 }
