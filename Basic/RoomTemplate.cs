@@ -15,6 +15,9 @@ public abstract class RoomTemplate : MonoBehaviour {
     public string groupId;
     public string roomName;
     public bool isQueueTable;
+    [HideInInspector]
+    public DateTime lastUpdateTime;
+
 
     public abstract void OnMessage(string _message);
     public abstract void OnError(string _message);
@@ -31,7 +34,8 @@ public abstract class RoomTemplate : MonoBehaviour {
 
 
     void OnMessageEvent(string _message)
-    {    
+    {
+        SetLastUpdateTime(_message);
         OnMessage(_message);      
     }
 
@@ -56,6 +60,7 @@ public abstract class RoomTemplate : MonoBehaviour {
             if (_isSubscribe)
             {
                 Debug.Log("註冊訊息：" + response.DataAsText);
+                SetLastUpdateTime(response.DataAsText);
                 OnSubscribeFinished(response.DataAsText);
             }
             else
@@ -115,4 +120,13 @@ public abstract class RoomTemplate : MonoBehaviour {
         webSocketController.errorEvents.Remove(key);
     }
 
+    //為了將java的unix time轉成DateTime
+    private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    void SetLastUpdateTime(string _msg)
+    {
+        var jobj = JsonConvert.DeserializeObject<JObject>(_msg);
+        lastUpdateTime = epoch.AddSeconds((double)jobj.GetValue("lastUpdateTime"));
+    }
+
+    
 }

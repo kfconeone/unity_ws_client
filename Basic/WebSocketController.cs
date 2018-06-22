@@ -116,14 +116,14 @@ public class WebSocketController : MonoBehaviour {
         {
             webSocket.Close();    
         }
-        //openEvent = null;
+        openEvent = null;
         //messageReceivedEvent = null;
-        //closeEvent = null;
-        //errorEvent = null;
-        mOpenEvents.Clear();
-        mMessageReceivedEvents.Clear();
-        mCloseEvents.Clear();
-        mErrorEvents.Clear();
+        closeEvent = null;
+        errorEvent = null;
+        if(mOpenEvents != null) mOpenEvents.Clear();
+        if(mMessageReceivedEvents != null) mMessageReceivedEvents.Clear();
+        if(mCloseEvents != null) mCloseEvents.Clear();
+        if (mErrorEvents != null) mErrorEvents.Clear();
 
         webSocket = null;
     }
@@ -193,12 +193,16 @@ public class WebSocketController : MonoBehaviour {
 #endif
 
         Debug.Log(string.Format("連線發生錯誤: {0}\n", (ex != null ? ex.Message : "Unknown Error " + errorMsg)));
-        foreach (Action<string> errorEvent in errorEvents.Values)
+        if (ex != null)
         {
-            if (errorEvent != null) errorEvent.Invoke(ex.Message);
+            //這是桌資料的錯誤事件處理
+            foreach (Action<string> err in errorEvents.Values)
+            {
+                if (err != null) err.Invoke(ex.Message);
+            }
         }
-
-        
+        //這是斷線重連的錯誤處理
+        if (errorEvent != null) errorEvent((ex != null ? ex.Message : "Unknown Error " + errorMsg));
         webSocket = null;
     }
 

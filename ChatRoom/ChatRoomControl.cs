@@ -49,11 +49,11 @@ public class ChatRoomControl : RoomTemplate
         foreach (JObject obj in currentTable)
         {
             double tempDate = (double)obj.GetValue("date");
-            if (tempDate > lastUpdateTime)
-            {
+            //if (tempDate > lastUpdateTime)
+            //{
                 GenerateText(obj.GetValue("name").ToString(), obj.GetValue("content").ToString(), "ffffffff");
                 lastUpdateTime = tempDate;
-            }
+            //}
         }
 
         
