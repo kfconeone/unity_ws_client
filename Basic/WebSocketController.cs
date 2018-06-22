@@ -116,10 +116,10 @@ public class WebSocketController : MonoBehaviour {
         {
             webSocket.Close();    
         }
-        openEvent = null;
+        //openEvent = null;
         //messageReceivedEvent = null;
-        closeEvent = null;
-        errorEvent = null;
+        //closeEvent = null;
+        //errorEvent = null;
         if(mOpenEvents != null) mOpenEvents.Clear();
         if(mMessageReceivedEvents != null) mMessageReceivedEvents.Clear();
         if(mCloseEvents != null) mCloseEvents.Clear();
