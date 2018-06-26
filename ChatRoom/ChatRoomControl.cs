@@ -51,7 +51,7 @@ public class ChatRoomControl : RoomTemplate
             double tempDate = (double)obj.GetValue("date");
             //if (tempDate > lastUpdateTime)
             //{
-                GenerateText(obj.GetValue("name").ToString(), obj.GetValue("content").ToString(), "ffffffff");
+                GenerateText(obj.GetValue("nickName").ToString(), obj.GetValue("content").ToString(), "ffffffff");
                 lastUpdateTime = tempDate;
             //}
         }

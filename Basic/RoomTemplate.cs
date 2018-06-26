@@ -125,7 +125,7 @@ public abstract class RoomTemplate : MonoBehaviour {
     void SetLastUpdateTime(string _msg)
     {
         var jobj = JsonConvert.DeserializeObject<JObject>(_msg);
-        lastUpdateTime = epoch.AddSeconds((double)jobj.GetValue("lastUpdateTime"));
+        lastUpdateTime = epoch.AddMilliseconds((double)jobj.GetValue("lastUpdateTime"));
     }
 
     

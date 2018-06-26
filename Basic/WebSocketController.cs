@@ -150,20 +150,21 @@ public class WebSocketController : MonoBehaviour {
     void OnMessageReceived(WebSocket ws, string message)
     {
         JObject res = JsonConvert.DeserializeObject<JObject>(message);
-        string groupId = string.Empty;
-        if (res.GetValue("groupId") != null)
-        {
-            groupId = res.GetValue("groupId").ToString();
-        }
-        string tableId = res.GetValue("tableId").ToString();
-        if (tableId == "CONNECT")
+
+        string messageType = res.GetValue("messageType").ToString();
+        if (messageType.Equals("CONNECTED"))   //先檢查此次訊息的類型是否為連接事件
         {
             sessionId = res.GetValue("sessionId").ToString();
             Debug.Log("當前連線的sessionId : " + sessionId);
 
+            //給完sessionId才是"名義上"被認可的連接成功，因此openEvent在此執行而不是OnOpen
             if (openEvent != null) openEvent.Invoke();
             return;
         }
+
+
+        string groupId = res.GetValue("groupId").ToString();
+        string tableId = res.GetValue("tableId").ToString();
         string key = string.Format("{0}_{1}",groupId,tableId);
         if (messageReceivedEvents.ContainsKey(key)) messageReceivedEvents[key](message);
     }
