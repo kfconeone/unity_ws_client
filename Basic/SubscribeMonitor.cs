@@ -8,6 +8,15 @@ public class SubscribeMonitor : MonoBehaviour
 {
     void OnEnable()
     {
+        WebSocketController mController = GetComponent<RoomTemplate>().webSocketController;
+        if (mController == null)
+        {
+            gameObject.SetActive(false);
+            Debug.LogWarning("尚未指定wsController");
+            return;
+        }
+
+
         if (string.IsNullOrEmpty(GetComponent<RoomTemplate>().roomName) || string.IsNullOrEmpty(GetComponent<RoomTemplate>().groupId))
         {
             Debug.LogError("roomName或groupId其中一項為空");
@@ -18,7 +27,8 @@ public class SubscribeMonitor : MonoBehaviour
         }
 
         Debug.Log("開啟自動訂閱桌子 : " + GetComponent<RoomTemplate>().roomName);
-        WebSocketController mController = GetComponent<RoomTemplate>().webSocketController;
+
+        
 
         mController.openEvent += HandleResubscribe;
         if (mController.webSocket != null && mController.webSocket.IsOpen)
@@ -34,6 +44,8 @@ public class SubscribeMonitor : MonoBehaviour
 
     void OnDisable()
     {
+        if (GetComponent<RoomTemplate>().webSocketController == null) return;
+
         Debug.Log("取消訂閱" + GetComponent<RoomTemplate>().roomName);
         GetComponent<RoomTemplate>().UnsubscribeTable();
         GetComponent<RoomTemplate>().webSocketController.openEvent -= HandleResubscribe;

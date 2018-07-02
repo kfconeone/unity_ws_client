@@ -53,8 +53,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webSocketController: {fileID: 0}
-  groupId: SYstemMessage
-  roomName: SYstemToGM00001
+  groupId: SystemMessage
+  roomName: SystemToGM00001
   isQueueTable: 0
 --- !u!114 &114369015882557228
 MonoBehaviour:
