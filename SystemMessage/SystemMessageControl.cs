@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 public class SystemMessageControl : RoomTemplate
 {
-    public Dictionary<string, object> systemMessage;
+    public Dictionary<string, object> currentSystemMessage;
     //各項系統訊息事件
     public Action onShouldCheckChatRoomsEvent;
 
@@ -45,18 +45,35 @@ public class SystemMessageControl : RoomTemplate
         //接下來取得新的systemMessage
         PlayerPrefs.SetString("systemMessage", _message);
         JObject jsonObj = JsonConvert.DeserializeObject<JObject>(_message);
-        systemMessage = jsonObj.GetValue("detail").ToObject<Dictionary<string, object>>();
+        currentSystemMessage = jsonObj.GetValue("detail").ToObject<Dictionary<string, object>>();
 
         //如果有舊的就先進行比對，如果是新的就無須通知
         if (hasOldSystemMessage)
         {
-            //檢查聊天室信號
-            if ((double)systemMessage["shouldCheckChatRooms"] > (double)olsSystemMessage["shouldCheckChatRooms"])
-            {
-                Debug.Log("即時系統提醒 : shouldCheckChatRooms");
-                if (onShouldCheckChatRoomsEvent != null) onShouldCheckChatRoomsEvent();
-            }
+            CheckSystemMessageUpdated("shouldCheckChatRooms", onShouldCheckChatRoomsEvent, olsSystemMessage);
         }
 
+    }
+
+    void CheckSystemMessageUpdated(string _key,Action _event, Dictionary<string, object> _olsSystemMessage)
+    {
+        //=====檢查聊天室信號=====
+        //先檢查新的系統訊息有沒有
+        if (currentSystemMessage.ContainsKey(_key))
+        {
+            if (!_olsSystemMessage.ContainsKey(_key))
+            {
+                Debug.Log("即時系統提醒 : " + _key);
+                if (onShouldCheckChatRoomsEvent != null) onShouldCheckChatRoomsEvent();
+            }
+            else
+            {
+                if ((double)currentSystemMessage[_key] > (double)_olsSystemMessage[_key])
+                {
+                    Debug.Log("即時系統提醒 : " + _key);
+                    if (_event != null) _event();
+                }
+            }
+        }
     }
 }
