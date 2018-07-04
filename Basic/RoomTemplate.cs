@@ -9,6 +9,7 @@ using BestHTTP.WebSocket;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
+[RequireComponent(typeof(SubscribeMonitor))]
 public abstract class RoomTemplate : MonoBehaviour {
 
     public WebSocketController webSocketController;
