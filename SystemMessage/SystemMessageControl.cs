@@ -9,7 +9,19 @@ public class SystemMessageControl : RoomTemplate
 {
     public Dictionary<string, object> currentSystemMessage;
     //各項系統訊息事件
-    public Action onShouldCheckChatRoomsEvent;
+    public Dictionary<string, Action> systemMessageEvent
+    {
+        get
+        {
+            if (mSstemMessageEvent == null)
+            {
+                mSstemMessageEvent = new Dictionary<string, Action>();
+            }
+            return mSstemMessageEvent;
+        }
+    }
+    Dictionary<string, Action> mSstemMessageEvent;
+
 
     public override void OnError(string _message)
     {
@@ -50,7 +62,10 @@ public class SystemMessageControl : RoomTemplate
         //如果有舊的就先進行比對，如果是新的就無須通知
         if (hasOldSystemMessage)
         {
-            CheckSystemMessageUpdated("shouldCheckChatRooms", onShouldCheckChatRoomsEvent, olsSystemMessage);
+            foreach (string key in systemMessageEvent.Keys)
+            {
+                CheckSystemMessageUpdated(key, systemMessageEvent[key], olsSystemMessage);
+            }
         }
 
     }
@@ -64,7 +79,7 @@ public class SystemMessageControl : RoomTemplate
             if (!_olsSystemMessage.ContainsKey(_key))
             {
                 Debug.Log("即時系統提醒 : " + _key);
-                if (onShouldCheckChatRoomsEvent != null) onShouldCheckChatRoomsEvent();
+                if (_event != null) _event();
             }
             else
             {
