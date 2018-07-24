@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(RoomTemplate))]
 /// <summary>
 /// 用來輔助RoomTemplate的class，可有可無
 /// </summary>
 public class SubscribeMonitor : MonoBehaviour
 {
+    bool isSubscribed;
     void OnEnable()
     {
         WebSocketController mController = GetComponent<RoomTemplate>().webSocketController;
         if (mController == null)
         {
-            gameObject.SetActive(false);
+            enabled = false;
             Debug.LogWarning("尚未指定wsController");
             return;
         }
@@ -22,32 +22,32 @@ public class SubscribeMonitor : MonoBehaviour
             Debug.LogError("roomName或groupId其中一項為空");
             Debug.LogError("roomName : " + GetComponent<RoomTemplate>().roomName);
             Debug.LogError("groupId：" + GetComponent<RoomTemplate>().groupId);
-            gameObject.SetActive(false);
+            enabled = false;
             return;
         }
 
         Debug.Log("開啟自動訂閱桌子 : " + GetComponent<RoomTemplate>().roomName);
 
-        
-
-        mController.openEvent += HandleResubscribe;
+        mController.openSocketEvent += HandleResubscribe;
         if (mController.webSocket != null && mController.webSocket.IsOpen)
         {
-            GetComponent<RoomTemplate>().SubscribeTable();
+            HandleResubscribe();        
         }
     }
 
     void HandleResubscribe()
     {
+        isSubscribed = true;
         GetComponent<RoomTemplate>().SubscribeTable();
     }
 
     void OnDisable()
     {
         if (GetComponent<RoomTemplate>().webSocketController == null) return;
-
+        if (!isSubscribed) return;
         Debug.Log("取消訂閱" + GetComponent<RoomTemplate>().roomName);
         GetComponent<RoomTemplate>().UnsubscribeTable();
-        GetComponent<RoomTemplate>().webSocketController.openEvent -= HandleResubscribe;
+        GetComponent<RoomTemplate>().webSocketController.openSocketEvent -= HandleResubscribe;
     }
+
 }

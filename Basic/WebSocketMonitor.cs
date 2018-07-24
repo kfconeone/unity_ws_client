@@ -8,8 +8,8 @@ public class WebSocketMonitor : MonoBehaviour {
     void OnEnable()
     {
         Debug.Log("ws監控器註冊重連事件，並且開始連線。");
-        GetComponent<WebSocketController>().errorEvent += HandleReconnectError;
-        GetComponent<WebSocketController>().closeEvent += HandleReconnectClose;
+        GetComponent<WebSocketController>().errorSocketEvent += HandleReconnectError;
+        GetComponent<WebSocketController>().closeSocketEvent += HandleReconnectClose;
         GetComponent<WebSocketController>().OpenWebSocket();
     }
 
@@ -34,8 +34,8 @@ public class WebSocketMonitor : MonoBehaviour {
     void OnDisable()
     {
         Debug.Log("關閉連線");
-        GetComponent<WebSocketController>().errorEvent -= HandleReconnectError;
-        GetComponent<WebSocketController>().closeEvent -= HandleReconnectClose;
+        GetComponent<WebSocketController>().errorSocketEvent -= HandleReconnectError;
+        GetComponent<WebSocketController>().closeSocketEvent -= HandleReconnectClose;
         GetComponent<WebSocketController>().CloseWebSocket();
     }
 }

@@ -9,13 +9,13 @@ using BestHTTP.WebSocket;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-[RequireComponent(typeof(SubscribeMonitor))]
 public abstract class RoomTemplate : MonoBehaviour {
 
     public WebSocketController webSocketController;
     public string groupId;
     public string roomName;
     public bool isQueueTable;
+    public bool isManualLaunch;
     [HideInInspector]
     DateTime lastTableUpdateTime;
 
@@ -32,14 +32,16 @@ public abstract class RoomTemplate : MonoBehaviour {
         Debug.Log("OnOpen");
     }
 
-
-
     void OnMessageEvent(string _message)
     {
-        SetLastTableUpdateTime(_message);
+        //SetLastTableUpdateTime(_message);
         OnMessage(_message);      
     }
 
+    private void Awake()
+    {
+        SetLaunchState(!isManualLaunch);     
+    }
     void Subscribing(bool _isSubscribe)
     {
 
@@ -61,7 +63,7 @@ public abstract class RoomTemplate : MonoBehaviour {
             if (_isSubscribe)
             {
                 Debug.Log("註冊訊息：" + response.DataAsText);
-                SetLastTableUpdateTime(response.DataAsText);
+                //SetLastTableUpdateTime(response.DataAsText);
                 OnSubscribeFinished(response.DataAsText);
             }
             else
@@ -87,28 +89,27 @@ public abstract class RoomTemplate : MonoBehaviour {
     }
 
 
-    public bool SubscribeTable()
+    public void SubscribeTable()
     {
         if (string.IsNullOrEmpty(roomName))
         {
             Debug.LogError("房名不得為空，註冊失敗");
-            return false;
+            return;
         }
 
         if (!webSocketController.webSocket.IsOpen)
         {
             Debug.LogError("與Server端無連接，註冊失敗");
-            return false;
+            return;
         }
 
         string key = string.Format("{0}_{1}", groupId, roomName);
-        webSocketController.openEvents.Add(key, OnOpen);
-        webSocketController.messageReceivedEvents.Add(key, OnMessageEvent);
-        webSocketController.closeEvents.Add(key, OnClose);
-        webSocketController.errorEvents.Add(key, OnErrorEvent);
+        webSocketController.openEvents.Put(key, OnOpen);
+        webSocketController.messageReceivedEvents.Put(key, OnMessageEvent);
+        webSocketController.closeEvents.Put(key, OnClose);
+        webSocketController.errorEvents.Put(key, OnErrorEvent);
 
         Subscribing(true);
-        return true;
     }
 
     public void UnsubscribeTable()
@@ -121,18 +122,41 @@ public abstract class RoomTemplate : MonoBehaviour {
         webSocketController.errorEvents.Remove(key);
     }
 
+    public void SetLaunchState(bool _isLaunch)
+    {
+        SubscribeMonitor monitor = GetComponent<SubscribeMonitor>();
+        if (_isLaunch)
+        {
+            if (monitor == null)
+            {
+                gameObject.AddComponent<SubscribeMonitor>();
+            }
+            else
+            {
+                monitor.enabled = true;
+            }
+        }
+        else
+        {
+            if (monitor != null)
+            {
+                Destroy(monitor);
+            }
+        }
+    }   
+
+
     //為了將java的unix time轉成DateTime
-    private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    void SetLastTableUpdateTime(string _msg)
-    {
-        var jobj = JsonConvert.DeserializeObject<JObject>(_msg);
-        lastTableUpdateTime = epoch.AddMilliseconds((double)jobj.GetValue("lastUpdateTime"));
-    }
+    //private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    //void SetLastTableUpdateTime(string _msg)
+    //{
+    //    var jobj = JsonConvert.DeserializeObject<JObject>(_msg);
+    //    lastTableUpdateTime = epoch.AddMilliseconds((double)jobj.GetValue("lastUpdateTime"));
+    //}
 
-    DateTime GetLastUpdateTime(string _msg)
-    {
-        return lastTableUpdateTime;
-    }
-
+    //DateTime GetLastUpdateTime(string _msg)
+    //{
+    //    return lastTableUpdateTime;
+    //}
 
 }

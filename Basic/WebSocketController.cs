@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using BestHTTP;
 using BestHTTP.WebSocket;
@@ -17,12 +18,26 @@ public class WebSocketController : MonoBehaviour {
     /// </summary>
     [HideInInspector]
     public WebSocket webSocket;
-
+    
     //剩下這三個事件專門給斷線重連專用
-    public event Action openEvent;
+    public event Action openSocketEvent
+    {
+        add
+        {
+            if (mOpenSocketEvent == null || !mOpenSocketEvent.GetInvocationList().Contains(value))
+            {
+                mOpenSocketEvent += value;
+            }
+        }
+        remove
+        {
+            mOpenSocketEvent -= value;
+        }
+    }
+    event Action mOpenSocketEvent;
     //public event Action<string,string> messageReceivedEvent;
-    public event Action<int,string> closeEvent;
-    public event Action<string> errorEvent;
+    public event Action<int,string> closeSocketEvent;
+    public event Action<string> errorSocketEvent;
 
     //以下是給使用者量產使用的事件，原本是用上方的事件處理，嘗試改為Dictionary的方式，key為"[groupId]_[tableId]"
     public Dictionary<string, Action> openEvents
@@ -79,8 +94,12 @@ public class WebSocketController : MonoBehaviour {
 
     [HideInInspector]
     public string sessionId;
-    //public const string HOST = "entrance10.mobiusdice.com.tw:700";
+
+#if __LOCAL_HOST__
     public const string HOST = "localhost:8081";
+#else
+    public const string HOST = "entrance10.mobiusdice.com.tw:700";
+#endif
     //ws://localhost:8081/interactive
     // Use this for initialization
     public WebSocket OpenWebSocket() {
@@ -133,7 +152,7 @@ public class WebSocketController : MonoBehaviour {
         CloseWebSocket();
     }
 
-    #region WebSocket Event Handlers
+#region WebSocket Event Handlers
 
     /// <summary>
     /// Called when the web socket is open, and we are ready to send and receive data
@@ -158,7 +177,8 @@ public class WebSocketController : MonoBehaviour {
             Debug.Log("當前連線的sessionId : " + sessionId);
 
             //給完sessionId才是"名義上"被認可的連接成功，因此openEvent在此執行而不是OnOpen
-            if (openEvent != null) openEvent.Invoke();
+            if (mOpenSocketEvent != null) mOpenSocketEvent.Invoke();
+
             return;
         }
 
@@ -203,10 +223,10 @@ public class WebSocketController : MonoBehaviour {
             }
         }
         //這是斷線重連的錯誤處理
-        if (errorEvent != null) errorEvent((ex != null ? ex.Message : "Unknown Error " + errorMsg));
+        if (errorSocketEvent != null) errorSocketEvent((ex != null ? ex.Message : "Unknown Error " + errorMsg));
         webSocket = null;
     }
 
-    #endregion
+#endregion
 }
 

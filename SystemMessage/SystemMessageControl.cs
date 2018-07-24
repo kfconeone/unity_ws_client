@@ -22,7 +22,6 @@ public class SystemMessageControl : RoomTemplate
     }
     Dictionary<string, Action> mSstemMessageEvent;
 
-
     public override void OnError(string _message)
     {
         Debug.LogError("錯誤訊息：" + _message);
