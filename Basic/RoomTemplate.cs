@@ -16,8 +16,8 @@ public abstract class RoomTemplate : MonoBehaviour {
     public string roomName;
     public bool isQueueTable;
     public bool isManualLaunch;
-    [HideInInspector]
-    DateTime lastTableUpdateTime;
+    //[HideInInspector]
+    //DateTime lastTableUpdateTime;
 
 
     public abstract void OnMessage(string _message);
@@ -72,11 +72,13 @@ public abstract class RoomTemplate : MonoBehaviour {
             }
         });
 
-        Dictionary<string, object> req = new Dictionary<string, object>();
-        req.Add("groupId", groupId);
-        req.Add("tableId", roomName);
-        req.Add("isQueueTable", isQueueTable);
-        req.Add("sessionId", webSocketController.sessionId);
+        Dictionary<string, object> req = new Dictionary<string, object>
+        {
+            { "groupId", groupId },
+            { "tableId", roomName },
+            { "isQueueTable", isQueueTable },
+            { "sessionId", webSocketController.sessionId }
+        };
 
         request.RawData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req));
         request.Send();
