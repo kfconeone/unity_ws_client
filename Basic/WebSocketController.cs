@@ -11,8 +11,8 @@ using Newtonsoft.Json;
 
 public class WebSocketController : MonoBehaviour {
 
-
-
+    
+    
     /// <summary>
     /// Saved WebSocket instance
     /// </summary>
@@ -38,6 +38,10 @@ public class WebSocketController : MonoBehaviour {
     //public event Action<string,string> messageReceivedEvent;
     public event Action<int,string> closeSocketEvent;
     public event Action<string> errorSocketEvent;
+
+    //如果有需要AliveKeep就會用到
+    public bool isKeepAlive;
+    WebSocketLiveKeeper liveKeeper;
 
     //以下是給使用者量產使用的事件，原本是用上方的事件處理，嘗試改為Dictionary的方式，key為"[groupId]_[tableId]"
     public Dictionary<string, Action> openEvents
@@ -169,7 +173,6 @@ public class WebSocketController : MonoBehaviour {
     void OnMessageReceived(WebSocket ws, string message)
     {
         JObject res = JsonConvert.DeserializeObject<JObject>(message);
-
         string messageType = res.GetValue("messageType").ToString();
         if (messageType.Equals("CONNECTED"))   //先檢查此次訊息的類型是否為連接事件
         {
@@ -181,12 +184,27 @@ public class WebSocketController : MonoBehaviour {
 
             return;
         }
+        else if (messageType.Equals("KEEP_ALIVE"))  //如果是持續連接事件，直接忽略所有行為
+        {
+            return;
+        }
 
 
         string groupId = res.GetValue("groupId").ToString();
         string tableId = res.GetValue("tableId").ToString();
         string key = string.Format("{0}_{1}",groupId,tableId);
         if (messageReceivedEvents.ContainsKey(key)) messageReceivedEvents[key](message);
+
+        //如果有開啟持續存活，只要有收到訊息就keep alive
+        if (isKeepAlive)
+        {
+            
+            if (liveKeeper == null)
+            {
+                liveKeeper = GetComponent<WebSocketLiveKeeper>();
+            }
+            liveKeeper.StillAlive();
+        }
     }
 
     /// <summary>
